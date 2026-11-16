@@ -87,7 +87,7 @@ Data returned by the server follow the terms of each source registry, and the de
 | FDA 510(k), De Novo, PMA, recalls (via openFDA) | United States | U.S. public domain |
 | FDA GUDID (AccessGUDID) | United States | U.S. public domain |
 
-- Registries are synced monthly. `get_data_sources` gives the last sync date of each.
+- EUDAMED certificates are synced weekly, the other registries monthly. `get_data_sources` gives the last sync date of each.
 - The deviCERTS compilation, layout and text are licensed under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). Attribution, as in every result: *DevicErts, https://devicerts.com*.
 - The server returns registry facts only, no AI-written text.
 - A device can be in several registries, so counts overlap and do not add up.
