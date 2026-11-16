@@ -67,7 +67,7 @@ Every result carries `canonical_url`, `cite_as`, `retrieved_at`, `status_as_of` 
 - List Class III insulin pumps in EUDAMED and give their UDI-DIs.
 - Does the HeartStart FRx defibrillator have ongoing FDA recalls? Give the recall numbers.
 - Which notified body certified this device, and when does the certificate expire?
-- List ongoing Class I FDA recalls of infusion pumps started since 2024.
+- List ongoing Class I FDA recalls by Medtronic started since 2024.
 - Which MDR certificates has notified body 0344 issued that are valid today?
 
 ## Limits
