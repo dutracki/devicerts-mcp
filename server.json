@@ -1,0 +1,18 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "com.devicerts/medical-devices",
+  "title": "deviCERTS medical device regulatory data",
+  "description": "Search FDA 510(k)/PMA/De Novo, GUDID and EUDAMED device records. Read-only, no login.",
+  "version": "1.0.0",
+  "websiteUrl": "https://devicerts.com/mcp",
+  "repository": {
+    "url": "https://github.com/dutracki/devicerts-mcp",
+    "source": "github"
+  },
+  "remotes": [
+    {
+      "type": "streamable-http",
+      "url": "https://devicerts.com/mcp"
+    }
+  ]
+}
