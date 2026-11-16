@@ -59,7 +59,7 @@ Every result carries `canonical_url`, `cite_as`, `retrieved_at` and a `terms` bl
 
 ## Data, licence and limits
 
-- Read-only. At most 20 results per call, 16 KB per request, 5 calls per batch. Results are cached for up to an hour. Requests share a global queue, with a safety cap of 120 calls a minute per network address.
+- Read-only. At most 20 results per call, 16 KB per request, 5 calls per batch. Results are cached for up to an hour. Requests share a global queue, with a safety cap of 300 calls a minute per network address.
 - The deviCERTS compilation, layout and text are licensed under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). Attribution, as in every result: *DevicErts, https://devicerts.com*.
 - Registry data stay under each source's own terms: EUDAMED under the European Commission reuse terms, U.S. FDA and GUDID data in the U.S. public domain. `get_data_sources` lists them.
 - The server returns registry facts only, no AI-written text.
