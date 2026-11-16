@@ -50,6 +50,8 @@ All tools are read-only (`readOnlyHint: true`, `destructiveHint: false`, `idempo
 | `get_device` | You know the device slug and need its record | `slug`; `detail` (`summary`, `full`) |
 | `get_device_recalls` | You need the FDA recalls of one device | `slug`; `status` (`ongoing`, `completed`, `terminated`) |
 | `get_device_certificates` | You need the EU notified-body certificates of one device | `slug` |
+| `search_recalls` | You need FDA recalls across devices: by product code, firm, class, status or date | `query`; `product_code`; `firm`; `submission_number`; `pathway` (`510k`, `pma`, `denovo`); `date_from`; `date_to`; `recall_class` (`Class I`, `Class II`, `Class III`); `status`; `limit`; `offset` |
+| `search_certificates` | You have a certificate number, or ask what a notified body issued or a manufacturer holds | `number`; `notified_body` (number or name); `manufacturer` (name or SRN); `legislation` (`MDR`, `IVDR`); `status`; `valid_on`; `include_removed`; `limit`; `offset` |
 | `search_manufacturers` | You look for a company by name | `query`; `country` (ISO code, such as `DE`); `limit` (1 to 20); `offset` |
 | `get_manufacturer` | You know the manufacturer slug and need its profile | `slug` |
 | `get_data_sources` | You ask how current the data are, or how you may reuse them | none |
@@ -65,7 +67,8 @@ Every result carries `canonical_url`, `cite_as`, `retrieved_at`, `status_as_of` 
 - List Class III insulin pumps in EUDAMED and give their UDI-DIs.
 - Does the HeartStart FRx defibrillator have ongoing FDA recalls? Give the recall numbers.
 - Which notified body certified this device, and when does the certificate expire?
-- Find manufacturers named Philips based in the Netherlands.
+- List ongoing Class I FDA recalls of infusion pumps started since 2024.
+- Which MDR certificates has notified body 0344 issued that are valid today?
 
 ## Limits
 
@@ -75,6 +78,8 @@ Every result carries `canonical_url`, `cite_as`, `retrieved_at`, `status_as_of` 
 - Requests share a global queue, with a safety cap of 300 calls a minute per network address. A busy answer says when to retry.
 
 ## Data sources and licences
+
+Data returned by the server follow the terms of each source registry, and the deviCERTS compilation needs the CC BY 4.0 attribution below. The files of this repository are under the MIT licence (see [Licence](#licence)).
 
 | Source | Region | Terms |
 | --- | --- | --- |
@@ -86,6 +91,11 @@ Every result carries `canonical_url`, `cite_as`, `retrieved_at`, `status_as_of` 
 - The deviCERTS compilation, layout and text are licensed under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). Attribution, as in every result: *DevicErts, https://devicerts.com*.
 - The server returns registry facts only, no AI-written text.
 - A device can be in several registries, so counts overlap and do not add up.
+
+## Licence
+
+- The files in this repository (`server.json`, examples, docs code) are licensed under the [MIT licence](LICENSE).
+- Data returned by the server are not covered by the MIT licence. Registry data follow each source's terms (see above). The deviCERTS compilation, layout and text are under [CC BY 4.0](LICENSE-CC-BY-4.0), with the attribution *DevicErts, https://devicerts.com*.
 
 ## Privacy
 
@@ -100,6 +110,7 @@ deviCERTS is not an official register and gives no medical, legal or regulatory 
 ### 1.1.0 (2026-11)
 
 - New tools: `get_device_recalls` (FDA recalls of one device, with a status filter) and `get_device_certificates` (EU notified-body certificates of one device).
+- New tools: `search_recalls` (FDA recalls across all devices by words, product code, firm, submission, pathway, date range, class and status) and `search_certificates` (EUDAMED certificates by number, notified body, holder, legislation, status and validity date).
 - `search_devices`: new `region` filter (`EU`, `US`), `offset` paging and `device_class` as an enum of the 17 stored values.
 - `search_manufacturers`: new `country` filter and `offset` paging.
 - Search results carry `offset` and `next_offset`.
