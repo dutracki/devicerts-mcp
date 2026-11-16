@@ -5,6 +5,8 @@
 [![Auth](https://img.shields.io/badge/auth-none-555)](https://devicerts.com/mcp)
 [![Sources](https://img.shields.io/badge/sources-FDA%20%C2%B7%20EUDAMED%20%C2%B7%20GUDID-555)](https://devicerts.com/methodology)
 
+[![deviCERTS – medical device regulatory data MCP connector – tool definition quality and endpoint health on Glama](https://glama.ai/mcp/connectors/com.devicerts/medical-devices/badges/score.svg)](https://glama.ai/mcp/connectors/com.devicerts/medical-devices)
+
 Ask your AI assistant about medical devices. It gets answers from FDA and EUDAMED records. Free, read-only, no login.
 
 This is the public MCP server of [deviCERTS](https://devicerts.com), a catalogue of medical devices built from official registries: EUDAMED, FDA 510(k), De Novo, PMA, GUDID and FDA recalls.
