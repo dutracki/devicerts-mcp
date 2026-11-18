@@ -112,6 +112,14 @@ deviCERTS is not an official register and gives no medical, legal or regulatory 
 
 ## Changelog
 
+### 1.2.0 (2026-11-18)
+
+- New tool `search_gudid_listings`: FDA GUDID listings by UDI-DI, brand name or labeler. Returns listing fields (`primary_di`, brand or device name, version or model, labeler, device class, commercial status); an input that looks like a GTIN or HIBCC code matches the DI exactly first.
+- New tool `get_recall`: one FDA recall by its number, such as `Z-0079-2022`.
+- New tool `search_establishments`: EU operators by name or SRN (role, country) and FDA establishments by FEI number. `identifier_type` tells an SRN, a notified-body number and an authority ID apart.
+- Publisher: [Digitaly](https://digitaly.site), shown in the server metadata and instructions.
+- 15 tools in total; the 12 earlier tools are unchanged.
+
 ### 1.1.0 (2026-11)
 
 - New tools: `get_device_recalls` (FDA recalls of one device, with a status filter) and `get_device_certificates` (EU notified-body certificates of one device).
