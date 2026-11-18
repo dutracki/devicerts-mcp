@@ -23,7 +23,7 @@ This is the public MCP server of [deviCERTS](https://devicerts.com), a catalogue
 claude mcp add --transport http devicerts https://devicerts.com/mcp
 ```
 
-**ChatGPT:** turn on developer mode in Settings. Create a connector with the endpoint and no authentication. The `search` and `fetch` tools follow the ChatGPT connector and deep research format. Plan availability depends on OpenAI.
+**ChatGPT:** turn on developer mode in Settings. Create a connector with the endpoint and no authentication. The `search` and `fetch` tools are the standard pair ChatGPT connectors and deep research use. Plan availability depends on OpenAI.
 
 **Cursor** (`.cursor/mcp.json`)
 
@@ -52,17 +52,19 @@ All tools are read-only (`readOnlyHint: true`, `destructiveHint: false`, `idempo
 | `get_device` | You know the device slug and need its record | `slug`; `detail` (`summary`, `full`) |
 | `get_device_recalls` | You need the FDA recalls of one device | `slug`; `status` (`ongoing`, `completed`, `terminated`) |
 | `get_device_certificates` | You need the EU notified-body certificates of one device | `slug` |
-| `search_recalls` | You need FDA recalls across devices: by product code, firm, class, status or date | `query`; `product_code`; `firm`; `submission_number`; `pathway` (`510k`, `pma`, `denovo`); `date_from`; `date_to`; `recall_class` (`Class I`, `Class II`, `Class III`); `status`; `limit`; `offset` |
-| `search_certificates` | You have a certificate number, or ask what a notified body issued or a manufacturer holds | `number`; `notified_body` (number or name); `manufacturer` (name or SRN); `legislation` (`MDR`, `IVDR`); `status`; `valid_on`; `include_removed`; `limit`; `offset` |
+| `search_recalls` | You need FDA recalls across devices: by product code, firm, class, status or date | `query`; `product_code`; `firm`; `submission_number`; `pathway` (`510k`, `pma`, `denovo`); `date_from`; `date_to`; `recall_class` (`Class I`, `Class II`, `Class III`); `status`; `limit` (1 to 20); `offset` |
+| `search_certificates` | You have a certificate number, or ask what a notified body issued or a manufacturer holds | `number`; `notified_body` (number or name); `manufacturer` (name or SRN); `legislation` (`MDR`, `IVDR`); `status`; `valid_on`; `include_removed`; `limit` (1 to 20); `offset` |
 | `search_manufacturers` | You look for a company by name | `query`; `country` (ISO code, such as `DE`); `limit` (1 to 20); `offset` |
 | `get_manufacturer` | You know the manufacturer slug and need its profile | `slug` |
 | `get_data_sources` | You ask how current the data are, or how you may reuse them | none |
 | `search_gudid_listings` | You look for FDA GUDID listings by UDI-DI, brand name or labeler | `query`; `company`; `limit` (1 to 20); `offset` |
 | `get_recall` | You have an FDA recall number such as Z-0079-2022 | `recall_number` |
-| `search_establishments` | You look for an EU operator by name or SRN (role, country), or an FDA establishment by FEI number | `query`; `registry` (`eudamed`, `fda`); `actor_type`; `country`; `limit`; `offset` |
-| `search`, `fetch` | Your client supports only the ChatGPT search and fetch pair | `query`; `id` |
+| `search_establishments` | You look for an EU operator by name or SRN (role, country), or an FDA establishment by FEI number | `query`; `registry` (`eudamed`, `fda`); `actor_type`; `country`; `limit` (1 to 20); `offset` |
+| `search`, `fetch` | ChatGPT connectors and deep research (standard search/fetch pair). Hidden from the tool list for clients recognised as not ChatGPT; any client can still call them | `query`; `id` (`device:<slug>` or `manufacturer:<slug>`) |
 
 Search results carry `total`, `offset` and `next_offset`. Pass `next_offset` back to get the next page. Paging reaches the first 1,000 results.
+
+`tools/list` shows all 15 tools by default. It leaves out `search` and `fetch` (13 tools) only when the request's `clientInfo.name` (from `initialize`, or the 2026-07-28 per-request `_meta`) or its `User-Agent` is recognised as another client: node/undici, python-httpx, aiohttp, python-requests, Claude/Anthropic, Cursor, VS Code, Glama, Windsurf, Zed, Continue or Cline. The server is stateless, so it decides per request; an empty or unknown `User-Agent`, `curl`, or anything containing `openai` or `chatgpt` always gets all 15. Calls to `search` and `fetch` work for every client.
 
 Every result carries `canonical_url`, `cite_as`, `retrieved_at`, `status_as_of` and a `terms` block.
 
@@ -78,9 +80,21 @@ Every result carries `canonical_url`, `cite_as`, `retrieved_at`, `status_as_of` 
 ## Limits
 
 - Read-only. The server cannot change any record.
-- At most 20 results per page. Requests up to 16 KB, at most 5 calls per batch.
-- Results are cached for up to an hour.
-- Requests share a global queue, with a safety cap of 300 calls a minute per network address. A busy answer says when to retry.
+- Paged search tools (`search_devices`, `search_recalls`, `search_certificates`, `search_manufacturers`, `search_gudid_listings`, `search_establishments`): `limit` 1 to 20 (default 10), `offset` 0 to 999; offset plus limit stays within the first 1,000 results. `search` returns up to 10, with no `limit`.
+- Every POST to the endpoint, whatever its JSON-RPC method, is limited to 16 KB: a larger body gets HTTP 413 with JSON-RPC error `-32600`. A JSON-RPC batch (2025-03-26 clients) holds 1 to 5 messages of any method; otherwise HTTP 400, `-32600`.
+- Results are cached for up to an hour. Each request has a 10-second deadline.
+
+### Busy and retry answers
+
+None of these is a JSON-RPC error carrying retry data; read the HTTP status and headers.
+
+| When | Answer |
+| --- | --- |
+| More than 300 requests a minute from one network address (burst 300). A request counts once, a batch too | HTTP `429`, `Content-Type: application/problem+json`, body `{"type":"about:blank","title":"Too Many Requests","status":429,"detail":"Rate limit for this client reached."}`, `Retry-After` in seconds |
+| Server busy: 2 MCP requests run at a time, up to 16 wait at most 3 seconds | HTTP `503`, `text/plain` `Service busy, retry later.`, `Retry-After: 30`, `X-Admission: mcp/overload`, `mcp/queue_full` or `mcp/queue_timeout` |
+| The backend budget for MCP, shared by all assistants together (10 calls a second, burst 50; 2 at a time, 8 waiting), is used up, or the backend fails | HTTP `200`, tool result with `isError: true` and the text `DevicErts is rate limiting this client. Retry after N seconds.` (N from the backend's `Retry-After`) or `DevicErts is temporarily unavailable. The call can be retried.` |
+| The backend is slow (10-second deadline per request) | After about 10 s: HTTP `200`, tool result with `isError: true` and `DevicErts did not answer in time. The call can be retried.` Only if the answer still has not left after about 11 s: HTTP `504`, JSON-RPC error `-32603` `The request ran past its deadline. It can be retried.` No `Retry-After` on either |
+| Edge flood guard: POST `/mcp` counts with page views toward 60 requests per 10 seconds per address | Cloudflare answers `429` and blocks the address for 10 seconds |
 
 ## Data sources and licences
 
@@ -104,7 +118,14 @@ Data returned by the server follow the terms of each source registry, and the de
 
 ## Privacy
 
-The tools request no personal data and need no account. For each request the server logs one line: the tool name, the client name and version, the status, timing, result count, cache use, the page asked for, search terms cut to 80 characters, and a daily salted hash of the IP address (never the address itself). The lines stay in rotated server logs. Details: https://devicerts.com/privacy
+The server needs no account and its tools ask for no personal data, but search text is free text and can contain personal data, such as a person's name. Avoid putting personal data in a search unless you need to.
+
+For each request the server logs one line: the tool name, the client name and version, the status, timing, result count, cache use, the page asked for, the search text or identifier cut to 80 characters, and a hash of the IP address (SHA-256 of the address, a secret salt and the UTC date, so it changes every day; the address itself is never logged).
+
+- **Where and how long:** only in the server's rotated container logs. Retention is set by size, not by date: at most 5 files of 20 MB (about 100 MB, usually a few days of lines), cleared whenever the server is redeployed. Usage summaries may be kept in internal operations reports for up to 12 months: aggregated counts per tool and client and of the most frequent search terms, without IP hashes.
+- **Legal basis:** legitimate interest in running the server, seeing how it is used and protecting it against abuse (GDPR Art. 6(1)(f)). You can object at any time: contact@devicerts.com.
+
+Details: https://devicerts.com/privacy#p-mcp
 
 ## Disclaimer
 
