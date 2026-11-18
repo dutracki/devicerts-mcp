@@ -39,6 +39,8 @@ claude mcp add --transport http devicerts https://devicerts.com/mcp
 
 Menu names change between versions. Your client's MCP documentation is the final word.
 
+Operated by [Digitaly](https://digitaly.site), publisher of deviCERTS.
+
 ## Tools
 
 All tools are read-only (`readOnlyHint: true`, `destructiveHint: false`, `idempotentHint: true`) and return structured content with an output schema.
@@ -55,6 +57,9 @@ All tools are read-only (`readOnlyHint: true`, `destructiveHint: false`, `idempo
 | `search_manufacturers` | You look for a company by name | `query`; `country` (ISO code, such as `DE`); `limit` (1 to 20); `offset` |
 | `get_manufacturer` | You know the manufacturer slug and need its profile | `slug` |
 | `get_data_sources` | You ask how current the data are, or how you may reuse them | none |
+| `search_gudid_listings` | You look for FDA GUDID listings by UDI-DI, brand name or labeler | `query`; `company`; `limit` (1 to 20); `offset` |
+| `get_recall` | You have an FDA recall number such as Z-0079-2022 | `recall_number` |
+| `search_establishments` | You look for an EU operator by name or SRN (role, country), or an FDA establishment by FEI number | `query`; `registry` (`eudamed`, `fda`); `actor_type`; `country`; `limit`; `offset` |
 | `search`, `fetch` | Your client supports only the ChatGPT search and fetch pair | `query`; `id` |
 
 Search results carry `total`, `offset` and `next_offset`. Pass `next_offset` back to get the next page. Paging reaches the first 1,000 results.

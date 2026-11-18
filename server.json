@@ -3,7 +3,7 @@
   "name": "com.devicerts/medical-devices",
   "title": "deviCERTS medical device regulatory data",
   "description": "FDA 510(k)/PMA/De Novo, GUDID, recall and EUDAMED device and certificate data. Read-only, no login.",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "websiteUrl": "https://devicerts.com/mcp",
   "repository": {
     "url": "https://github.com/dutracki/devicerts-mcp",
@@ -14,5 +14,13 @@
       "type": "streamable-http",
       "url": "https://devicerts.com/mcp"
     }
-  ]
+  ],
+  "_meta": {
+    "io.modelcontextprotocol.registry/publisher-provided": {
+      "publisher": {
+        "name": "Digitaly",
+        "url": "https://digitaly.site"
+      }
+    }
+  }
 }
