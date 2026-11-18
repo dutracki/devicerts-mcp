@@ -6,6 +6,7 @@
 [![Sources](https://img.shields.io/badge/sources-FDA%20%C2%B7%20EUDAMED%20%C2%B7%20GUDID-555)](https://devicerts.com/methodology)
 
 [![deviCERTS – medical device regulatory data MCP connector – tool definition quality and endpoint health on Glama](https://glama.ai/mcp/connectors/com.devicerts/medical-devices/badges/score.svg)](https://glama.ai/mcp/connectors/com.devicerts/medical-devices)
+[![devicerts-mcp on LobeHub](https://lobehub.com/badge/mcp/dutracki-devicerts-mcp)](https://lobehub.com/mcp/dutracki-devicerts-mcp)
 
 Ask your AI assistant about medical devices. It gets answers from FDA and EUDAMED records. Free, read-only, no login.
 
